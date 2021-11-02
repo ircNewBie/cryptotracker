@@ -1,3 +1,4 @@
+import 'api_info.dart';
 //TODO: Add your imports here.
 
 const List<String> currenciesList = [
@@ -31,7 +32,7 @@ const List<String> cryptoList = [
 ];
 
 const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
-const apiKey = 'YOUR-API-KEY-HERE';
+const apiKey = myAPI;
 
 class CoinData {
   //TODO: Create your getCoinData() method here.

@@ -10,11 +10,14 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
+  String selectedCryptoAsset = 'BTC';
   double selectedCurrencyPrice = 0.0;
 
-  DropdownButton<String> androidDropdown() {
+  String _AppTiltle = '₿ CryptoTracker';
+
+  DropdownButton<String> androidDropdown(List menuItemList) {
     List<DropdownMenuItem<String>> dropdownItems = [];
-    for (String currency in currenciesList) {
+    for (String currency in menuItemList) {
       var newItem = DropdownMenuItem(
         child: Text(currency),
         value: currency,
@@ -28,6 +31,8 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value.toString();
+          getMarketData();
+          selectedCurrencyPrice;
         });
       },
     );
@@ -49,24 +54,27 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  //TODO: Create a method here called getData() to get the coin data from coin_data.dart
-  void getData() {
-    CoinData coinData = CoinData();
-    coinData.getCoinMarketData('BTC', selectedCurrency);
+  //getMarketData() is to get the coin data from coin_data.dart
+  void getMarketData() async {
+    CoinData coinData = CoinData(selectedCryptoAsset, selectedCurrency);
+    double price = await coinData.getCoinMarketData();
+    selectedCurrencyPrice = price;
+    setState(() {
+      selectedCurrencyPrice;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    //TODO: Call getData() when the screen loads up.
-    getData();
+    getMarketData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('₿ CryptoTracker'),
+        title: Text(_AppTiltle),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,7 +92,7 @@ class _PriceScreenState extends State<PriceScreen> {
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
                   // TODO: Update the Text Widget with the live bitcoin data here.
-                  '1 BTC = ? $selectedCurrency',
+                  '1 $selectedCryptoAsset now is at: \n ${selectedCurrencyPrice.toStringAsFixed(4)} \n $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -99,7 +107,8 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: Platform.isIOS ? iOSPicker() : androidDropdown(),
+            child:
+                Platform.isIOS ? iOSPicker() : androidDropdown(currenciesList),
           ),
         ],
       ),

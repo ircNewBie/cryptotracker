@@ -27,34 +27,34 @@ const List<String> currenciesList = [
   'ZAR'
 ];
 
-const List<String> cryptoList = [
-  'BTC',
-  'ETH',
-  'LTC',
-];
-
 const _apiKey = myAPI;
 const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
 
-// String _assetIDBase = 'BTC';
-// String _assetIDQoute = 'USD';
-
 class CoinData {
+  double marketPrice = 0.0;
   dynamic marketData;
-  void getCoinMarketData(assetIDBase, assetIDQoute) async {
+  String assetIDBase;
+  String assetIDQoute;
+
+  // Class Constructor
+  CoinData(this.assetIDBase, this.assetIDQoute);
+
+  Future<double> getCoinMarketData() async {
     var _apiURL = coinAPIURL + '/$assetIDBase/$assetIDQoute?apikey=$_apiKey';
     final response = await http.get(Uri.parse(_apiURL));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> marketData = jsonDecode(response.body);
-//       print(marketData);
       var _marketPrice = marketData['rate'].toDouble();
       var _assetIDBase = marketData['asset_id_base'];
       var _assetIDQoute = marketData['asset_id_quote'];
 
-      print('$_assetIDBase/$_assetIDQoute Price  ' + _marketPrice.toString());
+      marketPrice = _marketPrice;
+      print('$assetIDBase/$assetIDQoute:$marketPrice`');
+      return _marketPrice;
     } else {
       print(response.statusCode);
+      return 0.00;
     }
   }
 }

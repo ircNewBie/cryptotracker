@@ -5,6 +5,8 @@ import 'coin_data.dart';
 import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
+  const PriceScreen({Key? key}) : super(key: key);
+
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
@@ -14,8 +16,12 @@ class _PriceScreenState extends State<PriceScreen> {
   final String _appTiltle = '₿ CryptoTracker';
 
   String selectedCurrency = 'USD';
-  String selectedCryptoAssetBTC = 'BTC';
-  double selectedCurrencyPrice = 0.0;
+  String selectedCryptoAssetBTC = cryptoCurrencyList[0];
+  String selectedCryptoAssetETH = cryptoCurrencyList[1];
+  String selectedCryptoAssetLTC = cryptoCurrencyList[2];
+  double selectedCurrencyPriceBTC = 0.0;
+  double selectedCurrencyPriceETH = 0.0;
+  double selectedCurrencyPriceLTC = 0.0;
 
   DropdownButton<String> androidDropdown(List menuItemList) {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -34,7 +40,9 @@ class _PriceScreenState extends State<PriceScreen> {
         setState(() {
           selectedCurrency = value.toString();
           getMarketData();
-          selectedCurrencyPrice;
+          selectedCurrencyPriceBTC;
+          selectedCurrencyPriceETH;
+          selectedCurrencyPriceLTC;
         });
       },
     );
@@ -47,10 +55,19 @@ class _PriceScreenState extends State<PriceScreen> {
     }
 
     return CupertinoPicker(
-      backgroundColor: Colors.lightBlue,
+      backgroundColor: Colors.grey.shade900,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        // print(selectedIndex);
+        // print('Selected Index: $selectedIndex');
+        // print('Selected Value: ${currenciesList[selectedIndex]}');
+
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];
+          getMarketData();
+          selectedCurrencyPriceBTC;
+          selectedCurrencyPriceETH;
+          selectedCurrencyPriceLTC;
+        });
       },
       children: pickerItems,
     );
@@ -59,13 +76,17 @@ class _PriceScreenState extends State<PriceScreen> {
   //getMarketData() is to get the coin data from coin_data.dart
   void getMarketData() async {
     CoinData coinDataBTC = CoinData(selectedCryptoAssetBTC, selectedCurrency);
-    double price = await coinDataBTC.getCoinMarketData();
-    selectedCurrencyPrice = price;
-    print('$selectedCryptoAssetBTC/$selectedCurrency:$selectedCurrencyPrice');
-    print('$selectedCryptoAssetBTC/$selectedCurrency:$selectedCurrencyPrice');
-    print('$selectedCryptoAssetBTC/$selectedCurrency:$selectedCurrencyPrice');
+    CoinData coinDataETH = CoinData(selectedCryptoAssetETH, selectedCurrency);
+    CoinData coinDataLTC = CoinData(selectedCryptoAssetLTC, selectedCurrency);
+
+    selectedCurrencyPriceBTC = await coinDataBTC.getCoinMarketData();
+    selectedCurrencyPriceETH = await coinDataETH.getCoinMarketData();
+    selectedCurrencyPriceLTC = await coinDataLTC.getCoinMarketData();
+
     setState(() {
-      selectedCurrencyPrice;
+      selectedCurrencyPriceBTC;
+      selectedCurrencyPriceETH;
+      selectedCurrencyPriceLTC;
     });
   }
 
@@ -87,22 +108,37 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          CryptoCard(
-              selectedCryptoAsset: selectedCryptoAsset,
-              value: valueFormat,
-              selectedCurrencyPrice: selectedCurrencyPrice,
-              selectedCurrency: selectedCurrency),
-          CryptoCard(
-              selectedCryptoAsset: selectedCryptoAsset,
-              value: valueFormat,
-              selectedCurrencyPrice: selectedCurrencyPrice,
-              selectedCurrency: selectedCurrency),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CryptoCard(
+                  //BTC - Bitcoin
+                  selectedCryptoAsset: selectedCryptoAssetBTC,
+                  value: valueFormat,
+                  selectedCurrencyPrice: selectedCurrencyPriceBTC,
+                  selectedCurrency: selectedCurrency),
+              CryptoCard(
+                  //ETH - Etherium
+                  selectedCryptoAsset: selectedCryptoAssetETH,
+                  value: valueFormat,
+                  selectedCurrencyPrice: selectedCurrencyPriceETH,
+                  selectedCurrency: selectedCurrency),
+              CryptoCard(
+                  //LTC - LiteCoin
+                  selectedCryptoAsset: selectedCryptoAssetLTC,
+                  value: valueFormat,
+                  selectedCurrencyPrice: selectedCurrencyPriceLTC,
+                  selectedCurrency: selectedCurrency),
+            ],
+          ),
           Container(
             height: 150.0,
             alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
+            padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.black87,
             child:
+                // iOSPicker(),
                 Platform.isIOS ? iOSPicker() : androidDropdown(currenciesList),
           ),
         ],
@@ -128,7 +164,7 @@ class CryptoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
       child: Card(
         color: Colors.grey.shade900,
         elevation: 5.0,
@@ -139,10 +175,10 @@ class CryptoCard extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
           child: Text(
             //Update the Text Widget with the live bitcoin data here.
-            '1 $selectedCryptoAsset now is at: \n ${value.format(selectedCurrencyPrice)} \n $selectedCurrency',
+            '1 $selectedCryptoAsset =  ${value.format(selectedCurrencyPrice)}   $selectedCurrency',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.0,
+            style: const TextStyle(
+              fontSize: 14.0,
               color: Colors.white,
             ),
           ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'api_info.dart';
 import 'package:http/http.dart' as http;
 
+const List<String> cryptoCurrencyList = ['BTC', 'ETH', 'LTC'];
 const List<String> currenciesList = [
   'AUD',
   'BRL',
@@ -46,11 +47,11 @@ class CoinData {
     if (response.statusCode == 200) {
       Map<String, dynamic> marketData = jsonDecode(response.body);
       var _marketPrice = marketData['rate'].toDouble();
-      var _assetIDBase = marketData['asset_id_base'];
-      var _assetIDQoute = marketData['asset_id_quote'];
+      // var _assetIDBase = marketData['asset_id_base'];
+      // var _assetIDQoute = marketData['asset_id_quote'];
 
       marketPrice = _marketPrice;
-      print('$assetIDBase/$assetIDQoute:$marketPrice`');
+      // print('$_assetIDBase/$_assetIDQoute:$marketPrice`');
       return _marketPrice;
     } else {
       print(response.statusCode);

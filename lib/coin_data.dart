@@ -54,6 +54,7 @@ class CoinData {
       // print('$_assetIDBase/$_assetIDQoute:$marketPrice`');
       return _marketPrice;
     } else {
+      // ignore: avoid_print
       print(response.statusCode);
       return 0.00;
     }

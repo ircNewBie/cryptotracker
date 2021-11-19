@@ -172,7 +172,7 @@ class CryptoCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
           child: Text(
             //Update the Text Widget with the live bitcoin data here.
             '1 $selectedCryptoAsset =  ${value.format(selectedCurrencyPrice)}   $selectedCurrency',

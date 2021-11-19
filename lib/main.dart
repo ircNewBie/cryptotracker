@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'price_screen.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
           primaryColor: Colors.blueGrey,
           scaffoldBackgroundColor: Colors.white54),
-      home: PriceScreen(),
+      home: const PriceScreen(),
     );
   }
 }

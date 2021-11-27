@@ -1,19 +1,34 @@
+import 'package:cryptotracker/components/card_component.dart' show CryptoCard;
+import 'package:cryptotracker/coin_data.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'coin_data.dart';
 import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
+  const PriceScreen({Key? key}) : super(key: key);
+
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  String selectedCryptoAssetBTC = cryptoCurrencyList[0];
+  String selectedCryptoAssetETH = cryptoCurrencyList[1];
+  String selectedCryptoAssetLTC = cryptoCurrencyList[2];
   String selectedCurrency = 'USD';
-  String selectedCryptoAsset = 'BTC';
-  double selectedCurrencyPrice = 0.0;
+  double selectedCurrencyPriceBTC = 0.0;
+  double selectedCurrencyPriceETH = 0.0;
+  double selectedCurrencyPriceLTC = 0.0;
+  final valueFormat = NumberFormat("#,##0.00", "en_US");
 
-  String _AppTiltle = '₿ CryptoTracker';
+  final String _appTiltle = '₿ CryptoTracker';
+
+  @override
+  void initState() {
+    super.initState();
+    getMarketData();
+  }
 
   DropdownButton<String> androidDropdown(List menuItemList) {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -32,7 +47,9 @@ class _PriceScreenState extends State<PriceScreen> {
         setState(() {
           selectedCurrency = value.toString();
           getMarketData();
-          selectedCurrencyPrice;
+          selectedCurrencyPriceBTC;
+          selectedCurrencyPriceETH;
+          selectedCurrencyPriceLTC;
         });
       },
     );
@@ -45,10 +62,16 @@ class _PriceScreenState extends State<PriceScreen> {
     }
 
     return CupertinoPicker(
-      backgroundColor: Colors.lightBlue,
+      backgroundColor: Colors.grey.shade900,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        // print(selectedIndex);
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];
+          getMarketData();
+          selectedCurrencyPriceBTC;
+          selectedCurrencyPriceETH;
+          selectedCurrencyPriceLTC;
+        });
       },
       children: pickerItems,
     );
@@ -56,61 +79,71 @@ class _PriceScreenState extends State<PriceScreen> {
 
   //getMarketData() is to get the coin data from coin_data.dart
   void getMarketData() async {
-    CoinData coinData = CoinData(selectedCryptoAsset, selectedCurrency);
-    double price = await coinData.getCoinMarketData();
-    selectedCurrencyPrice = price;
-    setState(() {
-      selectedCurrencyPrice;
-    });
-  }
+    CoinData coinDataBTC = CoinData(selectedCryptoAssetBTC, selectedCurrency);
+    CoinData coinDataETH = CoinData(selectedCryptoAssetETH, selectedCurrency);
+    CoinData coinDataLTC = CoinData(selectedCryptoAssetLTC, selectedCurrency);
 
-  @override
-  void initState() {
-    super.initState();
-    getMarketData();
+    selectedCurrencyPriceBTC = await coinDataBTC.getCoinMarketData();
+    selectedCurrencyPriceETH = await coinDataETH.getCoinMarketData();
+    selectedCurrencyPriceLTC = await coinDataLTC.getCoinMarketData();
+
+    setState(() {
+      selectedCurrencyPriceBTC;
+      selectedCurrencyPriceETH;
+      selectedCurrencyPriceLTC;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(_AppTiltle),
+        backgroundColor: Colors.black,
+        title: Text(_appTiltle),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  // TODO: Update the Text Widget with the live bitcoin data here.
-                  '1 $selectedCryptoAsset now is at: \n ${selectedCurrencyPrice.toStringAsFixed(4)} \n $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              // crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CryptoCard(
+                    //BTC - Bitcoin
+                    selectedCryptoAsset: selectedCryptoAssetBTC,
+                    value: valueFormat,
+                    selectedCurrencyPrice: selectedCurrencyPriceBTC,
+                    selectedCurrency: selectedCurrency),
+                CryptoCard(
+                    //ETH - Etherium
+                    selectedCryptoAsset: selectedCryptoAssetETH,
+                    value: valueFormat,
+                    selectedCurrencyPrice: selectedCurrencyPriceETH,
+                    selectedCurrency: selectedCurrency),
+                CryptoCard(
+                    //LTC - LiteCoin
+                    selectedCryptoAsset: selectedCryptoAssetLTC,
+                    value: valueFormat,
+                    selectedCurrencyPrice: selectedCurrencyPriceLTC,
+                    selectedCurrency: selectedCurrency),
+              ],
             ),
-          ),
-          Container(
-            height: 150.0,
-            alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
-            color: Colors.lightBlue,
-            child:
-                Platform.isIOS ? iOSPicker() : androidDropdown(currenciesList),
-          ),
-        ],
+            Container(
+              height: 100.0,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(bottom: 30.0),
+              color: Colors.black87,
+              child:
+                  // iOSPicker(),
+                  Platform.isIOS
+                      ? iOSPicker()
+                      : androidDropdown(currenciesList),
+            ),
+          ],
+        ),
       ),
     );
   }

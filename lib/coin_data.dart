@@ -1,4 +1,3 @@
-// import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'api_info.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +31,7 @@ const _apiKey = myAPI;
 const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
 
 class CoinData {
-  double marketPrice = 0.0;
+  // double marketPrice = 0.0;
   dynamic marketData;
   String assetIDBase;
   String assetIDQoute;
@@ -47,11 +46,7 @@ class CoinData {
     if (response.statusCode == 200) {
       Map<String, dynamic> marketData = jsonDecode(response.body);
       var _marketPrice = marketData['rate'].toDouble();
-      // var _assetIDBase = marketData['asset_id_base'];
-      // var _assetIDQoute = marketData['asset_id_quote'];
 
-      marketPrice = _marketPrice;
-      // print('$_assetIDBase/$_assetIDQoute:$marketPrice`');
       return _marketPrice;
     } else {
       // ignore: avoid_print
